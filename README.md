@@ -55,6 +55,27 @@ Documento que presenta una síntesis de los hallazgos más relevantes del análi
 
 --------------------------------------------------  
 
+# **Carpeta Scripts**  
+
+Esta carpeta contiene el código utilizado para desarrollar el análisis de datos.  
+
+El análisis fue realizado utilizando el software **R**.  
+
+**Archivo incluido:**  
+
+- **Caso Predicting Customer Churn.R**  
+
+Este script incluye:  
+
+- Preparación y limpieza de los datos  
+- Cálculo de estadísticas descriptivas  
+- Estimación de modelos de probabilidad (MPL, logit y probit)  
+- Evaluación del modelo (R², matriz de confusión y errores)  
+- Generación de gráficos y tablas  
+- Análisis de relaciones entre variables  
+
+--------------------------------------------------  
+
 # **Carpeta Stores**  
 
 Esta carpeta contiene las bases de datos utilizadas para el análisis.  
@@ -74,27 +95,6 @@ Este archivo contiene la información utilizada en el caso, incluyendo datos sob
 - Variable de deserción (churn)  
 
 Estos datos constituyen la base para el análisis estadístico y la construcción de los resultados obtenidos.  
-
---------------------------------------------------  
-
-# **Carpeta Scripts**  
-
-Esta carpeta contiene el código utilizado para desarrollar el análisis de datos.  
-
-El análisis fue realizado utilizando el software **R**.  
-
-**Archivo incluido:**  
-
-- **Caso Predicting Customer Churn.R**  
-
-Este script incluye:  
-
-- Preparación y limpieza de los datos  
-- Cálculo de estadísticas descriptivas  
-- Estimación de modelos de probabilidad (MPL, logit y probit)  
-- Evaluación del modelo (R², matriz de confusión y errores)  
-- Generación de gráficos y tablas  
-- Análisis de relaciones entre variables  
 
 --------------------------------------------------  
 
