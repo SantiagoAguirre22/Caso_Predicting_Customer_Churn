@@ -406,3 +406,137 @@ tabla_probit_gt <- tabla_probit %>%
   )
 
 invisible(tabla_probit_gt)
+
+# ---------------------------------------------------------
+# Comparación general de modelos
+# ---------------------------------------------------------
+
+pseudo_logit <- pscl::pR2(modelo_logit)["McFadden"]
+pseudo_probit <- pscl::pR2(modelo_probit)["McFadden"]
+
+tabla_comparacion_modelos <- data.frame(
+  Modelo = c("MPL", "Logit", "Probit"),
+  R2 = c(
+    summary(modelo_mpl)$r.squared,
+    as.numeric(pseudo_logit),
+    as.numeric(pseudo_probit)
+  ),
+  AIC = c(
+    AIC(modelo_mpl),
+    AIC(modelo_logit),
+    AIC(modelo_probit)
+  )
+)
+
+tabla_comparacion_modelos_gt <- tabla_comparacion_modelos %>%
+  gt() %>%
+  tab_header(
+    title = md("**Comparación General de Modelos**")
+  ) %>%
+  fmt_number(
+    columns = c(R2, AIC),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(80),
+    heading.align = "center",
+    table.font.size = px(13),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_comparacion_modelos_gt)
+
+# ---------------------------------------------------------
+# Selección del modelo final
+# ---------------------------------------------------------
+
+modelo_final <- modelo_logit
+
+data_resultados <- data_modelo %>%
+  mutate(
+    Probabilidad_Churn = predict(modelo_final, type = "response"),
+    Prediccion_Churn = ifelse(Probabilidad_Churn >= 0.50, 1, 0),
+    Error = Churn - Probabilidad_Churn,
+    Error_Absoluto = abs(Error)
+  )
+
+# ---------------------------------------------------------
+# Tabla del modelo final
+# ---------------------------------------------------------
+
+tabla_modelo_final <- tidy(modelo_final) %>%
+  mutate(
+    Odds_Ratio = exp(estimate)
+  ) %>%
+  rename(
+    Variable = term,
+    Coeficiente = estimate,
+    `Error estándar` = std.error,
+    `Valor p` = p.value
+  )
+
+tabla_modelo_final_gt <- tabla_modelo_final %>%
+  gt() %>%
+  tab_header(
+    title = md("**Modelo Final Seleccionado: Logit**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, `Error estándar`, `Valor p`, Odds_Ratio),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_modelo_final_gt)
+
+# ---------------------------------------------------------
+# Interpretación de coeficientes relevantes
+# ---------------------------------------------------------
+
+variables_interpretacion <- c("CHI_Score", "Support_Cases", "Days_Since_Last_Login", "Customer_Age")
+variables_interpretacion <- variables_interpretacion[variables_interpretacion %in% tabla_modelo_final$Variable]
+
+tabla_interpretacion <- tabla_modelo_final %>%
+  filter(Variable %in% variables_interpretacion) %>%
+  mutate(
+    Interpretacion = case_when(
+      Coeficiente < 0 ~ "Un aumento en esta variable se asocia con una menor probabilidad de churn.",
+      Coeficiente > 0 ~ "Un aumento en esta variable se asocia con una mayor probabilidad de churn.",
+      TRUE ~ "La variable no presenta un efecto direccional claro."
+    )
+  ) %>%
+  select(Variable, Coeficiente, Odds_Ratio, `Valor p`, Interpretacion)
+
+tabla_interpretacion_gt <- tabla_interpretacion %>%
+  gt() %>%
+  tab_header(
+    title = md("**Interpretación de Coeficientes Relevantes**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, Odds_Ratio, `Valor p`),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(Variable, Coeficiente, Odds_Ratio, `Valor p`)
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_interpretacion_gt)
