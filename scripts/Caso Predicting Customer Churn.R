@@ -195,3 +195,75 @@ grafico_churn <- ggplot(
   formato_grafica
 
 print(grafico_churn)
+
+# ---------------------------------------------------------
+# Gráficos exploratorios de variables relevantes
+# ---------------------------------------------------------
+
+grafico_chi <- ggplot(
+  data_modelo,
+  aes(
+    x = factor(Churn, levels = c(0, 1), labels = c("Sin churn", "Con churn")),
+    y = CHI_Score
+  )
+) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "CHI Score según Churn",
+    x = "Grupo",
+    y = "CHI Score"
+  ) +
+  formato_grafica
+
+print(grafico_chi)
+
+grafico_soporte <- ggplot(
+  data_modelo,
+  aes(
+    x = factor(Churn, levels = c(0, 1), labels = c("Sin churn", "Con churn")),
+    y = Support_Cases
+  )
+) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "Casos de Soporte según Churn",
+    x = "Grupo",
+    y = "Casos de soporte"
+  ) +
+  formato_grafica
+
+print(grafico_soporte)
+
+grafico_login <- ggplot(
+  data_modelo,
+  aes(
+    x = factor(Churn, levels = c(0, 1), labels = c("Sin churn", "Con churn")),
+    y = Days_Since_Last_Login
+  )
+) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "Días desde el Último Login según Churn",
+    x = "Grupo",
+    y = "Días desde el último login"
+  ) +
+  formato_grafica
+
+print(grafico_login)
+
+grafico_logins <- ggplot(
+  data_modelo,
+  aes(
+    x = factor(Churn, levels = c(0, 1), labels = c("Sin churn", "Con churn")),
+    y = Logins
+  )
+) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "Número de Logins según Churn",
+    x = "Grupo",
+    y = "Logins"
+  ) +
+  formato_grafica
+
+print(grafico_logins)
