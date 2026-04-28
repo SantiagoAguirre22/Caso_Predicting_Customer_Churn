@@ -43,6 +43,7 @@ formato_grafica <- theme_gray() +
     axis.title = element_text(size = 11),
     axis.text = element_text(size = 10)
   )
+
 # ---------------------------------------------------------
 # Lectura y preparación de datos
 # ---------------------------------------------------------
