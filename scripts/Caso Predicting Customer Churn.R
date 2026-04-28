@@ -540,3 +540,161 @@ tabla_interpretacion_gt <- tabla_interpretacion %>%
   )
 
 invisible(tabla_interpretacion_gt)
+
+# ---------------------------------------------------------
+# Evaluación del desempeño del modelo
+# ---------------------------------------------------------
+
+matriz_confusion <- table(
+  Real = data_resultados$Churn,
+  Predicho = data_resultados$Prediccion_Churn
+)
+
+matriz_confusion
+
+VP <- ifelse("1" %in% rownames(matriz_confusion) & "1" %in% colnames(matriz_confusion), matriz_confusion["1", "1"], 0)
+VN <- ifelse("0" %in% rownames(matriz_confusion) & "0" %in% colnames(matriz_confusion), matriz_confusion["0", "0"], 0)
+FP <- ifelse("0" %in% rownames(matriz_confusion) & "1" %in% colnames(matriz_confusion), matriz_confusion["0", "1"], 0)
+FN <- ifelse("1" %in% rownames(matriz_confusion) & "0" %in% colnames(matriz_confusion), matriz_confusion["1", "0"], 0)
+
+accuracy <- (VP + VN) / (VP + VN + FP + FN)
+precision <- ifelse((VP + FP) == 0, NA, VP / (VP + FP))
+recall <- ifelse((VP + FN) == 0, NA, VP / (VP + FN))
+specificity <- ifelse((VN + FP) == 0, NA, VN / (VN + FP))
+
+tabla_metricas <- data.frame(
+  Metrica = c("Accuracy", "Precision", "Recall", "Specificity"),
+  Valor = c(accuracy, precision, recall, specificity)
+)
+
+tabla_metricas_gt <- tabla_metricas %>%
+  gt() %>%
+  tab_header(
+    title = md("**Métricas de Desempeño del Modelo Final**")
+  ) %>%
+  fmt_number(
+    columns = Valor,
+    decimals = 4
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(75),
+    heading.align = "center",
+    table.font.size = px(13),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_metricas_gt)
+
+tabla_matriz_confusion <- as.data.frame.matrix(matriz_confusion)
+
+tabla_matriz_confusion_gt <- tabla_matriz_confusion %>%
+  gt(rownames_to_stub = TRUE) %>%
+  tab_header(
+    title = md("**Matriz de Confusión: Valores Reales vs Predichos**")
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(70),
+    heading.align = "center",
+    table.font.size = px(13),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_matriz_confusion_gt)
+
+# ---------------------------------------------------------
+# Gráfico de errores
+# ---------------------------------------------------------
+
+grafico_errores <- ggplot(data_resultados, aes(x = Probabilidad_Churn, y = Error)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Gráfico de Errores del Modelo Final",
+    x = "Probabilidad estimada de churn",
+    y = "Error"
+  ) +
+  formato_grafica
+
+print(grafico_errores)
+
+grafico_error_absoluto <- ggplot(data_resultados, aes(x = Probabilidad_Churn, y = Error_Absoluto)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  labs(
+    title = "Error Absoluto según Probabilidad Estimada",
+    x = "Probabilidad estimada de churn",
+    y = "Error absoluto"
+  ) +
+  formato_grafica
+
+print(grafico_error_absoluto)
+
+# ---------------------------------------------------------
+# Curva ROC y AUC
+# ---------------------------------------------------------
+
+roc_modelo <- roc(data_resultados$Churn, data_resultados$Probabilidad_Churn)
+
+auc_modelo <- auc(roc_modelo)
+
+tabla_auc <- data.frame(
+  Medida = "AUC",
+  Valor = as.numeric(auc_modelo)
+)
+
+tabla_auc_gt <- tabla_auc %>%
+  gt() %>%
+  tab_header(
+    title = md("**Área Bajo la Curva ROC**")
+  ) %>%
+  fmt_number(
+    columns = Valor,
+    decimals = 4
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(60),
+    heading.align = "center",
+    table.font.size = px(13),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_auc_gt)
+
+plot(
+  roc_modelo,
+  main = "Curva ROC del Modelo Final",
+  col = "steelblue",
+  lwd = 2
+)
+
+# ---------------------------------------------------------
+# Comparación entre valores reales y predichos
+# ---------------------------------------------------------
+
+grafico_predicho_real <- ggplot(
+  data_resultados,
+  aes(
+    x = factor(Churn, levels = c(0, 1), labels = c("Sin churn real", "Con churn real")),
+    y = Probabilidad_Churn
+  )
+) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "Probabilidad Estimada según Churn Real",
+    x = "Resultado real",
+    y = "Probabilidad estimada de churn"
+  ) +
+  formato_grafica
+
+print(grafico_predicho_real)
