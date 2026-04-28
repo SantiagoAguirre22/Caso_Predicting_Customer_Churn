@@ -459,7 +459,7 @@ modelo_final <- modelo_logit
 data_resultados <- data_modelo %>%
   mutate(
     Probabilidad_Churn = predict(modelo_final, type = "response"),
-    Prediccion_Churn = ifelse(Probabilidad_Churn >= 0.50, 1, 0),
+    Prediccion_Churn = ifelse(Probabilidad_Churn >= 0.10, 1, 0),
     Error = Churn - Probabilidad_Churn,
     Error_Absoluto = abs(Error)
   )
