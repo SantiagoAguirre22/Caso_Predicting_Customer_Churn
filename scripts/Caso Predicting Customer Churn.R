@@ -321,3 +321,87 @@ tabla_mpl_gt <- tabla_mpl %>%
   )
 
 invisible(tabla_mpl_gt)
+
+# ---------------------------------------------------------
+# Modelo Logit
+# ---------------------------------------------------------
+
+modelo_logit <- glm(
+  formula_modelo,
+  data = data_modelo,
+  family = binomial(link = "logit")
+)
+
+summary(modelo_logit)
+
+tabla_logit <- tidy(modelo_logit) %>%
+  rename(
+    Variable = term,
+    Coeficiente = estimate,
+    `Error estándar` = std.error,
+    `Valor p` = p.value
+  )
+
+tabla_logit_gt <- tabla_logit %>%
+  gt() %>%
+  tab_header(
+    title = md("**Modelo Logit para Churn**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, `Error estándar`, `Valor p`),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_logit_gt)
+
+# ---------------------------------------------------------
+# Modelo Probit
+# ---------------------------------------------------------
+
+modelo_probit <- glm(
+  formula_modelo,
+  data = data_modelo,
+  family = binomial(link = "probit")
+)
+
+summary(modelo_probit)
+
+tabla_probit <- tidy(modelo_probit) %>%
+  rename(
+    Variable = term,
+    Coeficiente = estimate,
+    `Error estándar` = std.error,
+    `Valor p` = p.value
+  )
+
+tabla_probit_gt <- tabla_probit %>%
+  gt() %>%
+  tab_header(
+    title = md("**Modelo Probit para Churn**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, `Error estándar`, `Valor p`),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_probit_gt)
