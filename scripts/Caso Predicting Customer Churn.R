@@ -147,3 +147,51 @@ tabla_descriptiva_gt <- tabla_descriptiva %>%
   )
 
 invisible(tabla_descriptiva_gt)
+
+# ---------------------------------------------------------
+# Distribución de la variable Churn
+# ---------------------------------------------------------
+
+tabla_churn <- data_modelo %>%
+  count(Churn) %>%
+  mutate(
+    Grupo = ifelse(Churn == 1, "Cliente con churn", "Cliente sin churn"),
+    Porcentaje = n / sum(n)
+  ) %>%
+  select(Grupo, Frecuencia = n, Porcentaje)
+
+tabla_churn_gt <- tabla_churn %>%
+  gt() %>%
+  tab_header(
+    title = md("**Distribución de la Variable Churn**")
+  ) %>%
+  fmt_percent(
+    columns = Porcentaje,
+    decimals = 2
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(75),
+    heading.align = "center",
+    table.font.size = px(13),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_churn_gt)
+
+grafico_churn <- ggplot(
+  data_modelo,
+  aes(x = factor(Churn, levels = c(0, 1), labels = c("Sin churn", "Con churn")))
+) +
+  geom_bar(fill = "steelblue") +
+  labs(
+    title = "Distribución de Clientes según Churn",
+    x = "Grupo",
+    y = "Número de clientes"
+  ) +
+  formato_grafica
+
+print(grafico_churn)
