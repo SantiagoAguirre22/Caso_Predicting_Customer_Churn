@@ -79,3 +79,71 @@ data <- data %>%
   )
 
 table(data$Churn, useNA = "ifany")
+
+# ---------------------------------------------------------
+# Selección de variables para el modelo
+# ---------------------------------------------------------
+
+data_modelo <- data %>%
+  select(
+    Churn,
+    Customer_Age,
+    CHI_Score,
+    CHI_Change,
+    Support_Cases,
+    Support_Cases_Change,
+    Support_Priority,
+    Support_Priority_Change,
+    Logins,
+    Blog_Articles,
+    Views,
+    Days_Since_Last_Login
+  ) %>%
+  na.omit()
+
+str(data_modelo)
+head(data_modelo)
+names(data_modelo)
+table(data_modelo$Churn, useNA = "ifany")
+
+# ---------------------------------------------------------
+# Tabla descriptiva de los datos
+# ---------------------------------------------------------
+
+tabla_descriptiva <- data_modelo %>%
+  summarise(across(
+    everything(),
+    list(
+      Minimo = ~min(.x, na.rm = TRUE),
+      Promedio = ~mean(.x, na.rm = TRUE),
+      Desviacion = ~sd(.x, na.rm = TRUE),
+      Maximo = ~max(.x, na.rm = TRUE)
+    )
+  )) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = c("Variable", ".value"),
+    names_pattern = "(.+)_(Minimo|Promedio|Desviacion|Maximo)"
+  )
+
+tabla_descriptiva_gt <- tabla_descriptiva %>%
+  gt() %>%
+  tab_header(
+    title = md("**Tabla Descriptiva de los Datos**")
+  ) %>%
+  fmt_number(
+    columns = c(Minimo, Promedio, Desviacion, Maximo),
+    decimals = 4
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_descriptiva_gt)
