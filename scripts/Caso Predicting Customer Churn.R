@@ -698,3 +698,97 @@ grafico_predicho_real <- ggplot(
   formato_grafica
 
 print(grafico_predicho_real)
+
+# ---------------------------------------------------------
+# Clientes con mayor riesgo de churn
+# ---------------------------------------------------------
+
+ranking_clientes_riesgo <- data_resultados %>%
+  mutate(ID_Cliente = row_number()) %>%
+  arrange(desc(Probabilidad_Churn)) %>%
+  select(ID_Cliente, Churn, Probabilidad_Churn, Prediccion_Churn, Error_Absoluto) %>%
+  head(100)
+
+tabla_ranking_clientes_gt <- ranking_clientes_riesgo %>%
+  gt() %>%
+  tab_header(
+    title = md("**Clientes con Mayor Probabilidad Estimada de Churn**")
+  ) %>%
+  fmt_number(
+    columns = c(Probabilidad_Churn, Error_Absoluto),
+    decimals = 4
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(90),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(5)
+  )
+
+invisible(tabla_ranking_clientes_gt)
+
+# ---------------------------------------------------------
+# Principales determinantes del churn
+# ---------------------------------------------------------
+
+tabla_drivers <- tabla_modelo_final %>%
+  filter(Variable != "(Intercept)") %>%
+  mutate(
+    Impacto = abs(Coeficiente),
+    Direccion = ifelse(
+      Coeficiente > 0,
+      "Aumenta la probabilidad de churn",
+      "Reduce la probabilidad de churn"
+    )
+  ) %>%
+  arrange(desc(Impacto)) %>%
+  select(Variable, Coeficiente, Odds_Ratio, `Valor p`, Direccion)
+
+tabla_drivers_gt <- tabla_drivers %>%
+  gt() %>%
+  tab_header(
+    title = md("**Principales Determinantes del Churn**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, Odds_Ratio, `Valor p`),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(Variable, Coeficiente, Odds_Ratio, `Valor p`)
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_drivers_gt)
+
+# ---------------------------------------------------------
+# Exportar resultados principales
+# ---------------------------------------------------------
+
+write.csv(tabla_descriptiva, "tabla_descriptiva_churn.csv", row.names = FALSE)
+write.csv(tabla_comparacion_modelos, "comparacion_modelos_churn.csv", row.names = FALSE)
+write.csv(tabla_metricas, "metricas_modelo_churn.csv", row.names = FALSE)
+write.csv(ranking_clientes_riesgo, "ranking_clientes_riesgo_churn.csv", row.names = FALSE)
+write.csv(tabla_drivers, "drivers_churn.csv", row.names = FALSE)
+
+# ---------------------------------------------------------
+# Guardar gráficos principales
+# ---------------------------------------------------------
+
+ggsave("grafico_distribucion_churn.png", grafico_churn, width = 8, height = 5)
+ggsave("grafico_chi_churn.png", grafico_chi, width = 8, height = 5)
+ggsave("grafico_soporte_churn.png", grafico_soporte, width = 8, height = 5)
+ggsave("grafico_ultimo_login_churn.png", grafico_login, width = 8, height = 5)
+ggsave("grafico_logins_churn.png", grafico_logins, width = 8, height = 5)
+ggsave("grafico_errores_modelo.png", grafico_errores, width = 8, height = 5)
+ggsave("grafico_error_absoluto_modelo.png", grafico_error_absoluto, width = 8, height = 5)
+ggsave("grafico_predicho_vs_real.png", grafico_predicho_real, width = 8, height = 5)
