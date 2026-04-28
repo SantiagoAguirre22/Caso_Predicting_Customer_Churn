@@ -267,3 +267,57 @@ grafico_logins <- ggplot(
   formato_grafica
 
 print(grafico_logins)
+
+# ---------------------------------------------------------
+# Especificación de modelos de probabilidad
+# ---------------------------------------------------------
+
+formula_modelo <- Churn ~ Customer_Age +
+  CHI_Score +
+  CHI_Change +
+  Support_Cases +
+  Support_Cases_Change +
+  Support_Priority +
+  Support_Priority_Change +
+  Logins +
+  Blog_Articles +
+  Views +
+  Days_Since_Last_Login
+
+# ---------------------------------------------------------
+# Modelo de Probabilidad Lineal
+# ---------------------------------------------------------
+
+modelo_mpl <- lm(formula_modelo, data = data_modelo)
+
+summary(modelo_mpl)
+
+tabla_mpl <- tidy(modelo_mpl) %>%
+  rename(
+    Variable = term,
+    Coeficiente = estimate,
+    `Error estándar` = std.error,
+    `Valor p` = p.value
+  )
+
+tabla_mpl_gt <- tabla_mpl %>%
+  gt() %>%
+  tab_header(
+    title = md("**Modelo de Probabilidad Lineal para Churn**")
+  ) %>%
+  fmt_number(
+    columns = c(Coeficiente, `Error estándar`, `Valor p`),
+    decimals = 6
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    heading.align = "center",
+    table.font.size = px(12),
+    data_row.padding = px(6)
+  )
+
+invisible(tabla_mpl_gt)
