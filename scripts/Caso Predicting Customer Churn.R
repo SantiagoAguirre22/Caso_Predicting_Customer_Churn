@@ -769,26 +769,3 @@ tabla_drivers_gt <- tabla_drivers %>%
   )
 
 invisible(tabla_drivers_gt)
-
-# ---------------------------------------------------------
-# Exportar resultados principales
-# ---------------------------------------------------------
-
-write.csv(tabla_descriptiva, "tabla_descriptiva_churn.csv", row.names = FALSE)
-write.csv(tabla_comparacion_modelos, "comparacion_modelos_churn.csv", row.names = FALSE)
-write.csv(tabla_metricas, "metricas_modelo_churn.csv", row.names = FALSE)
-write.csv(ranking_clientes_riesgo, "ranking_clientes_riesgo_churn.csv", row.names = FALSE)
-write.csv(tabla_drivers, "drivers_churn.csv", row.names = FALSE)
-
-# ---------------------------------------------------------
-# Guardar gráficos principales
-# ---------------------------------------------------------
-
-ggsave("grafico_distribucion_churn.png", grafico_churn, width = 8, height = 5)
-ggsave("grafico_chi_churn.png", grafico_chi, width = 8, height = 5)
-ggsave("grafico_soporte_churn.png", grafico_soporte, width = 8, height = 5)
-ggsave("grafico_ultimo_login_churn.png", grafico_login, width = 8, height = 5)
-ggsave("grafico_logins_churn.png", grafico_logins, width = 8, height = 5)
-ggsave("grafico_errores_modelo.png", grafico_errores, width = 8, height = 5)
-ggsave("grafico_error_absoluto_modelo.png", grafico_error_absoluto, width = 8, height = 5)
-ggsave("grafico_predicho_vs_real.png", grafico_predicho_real, width = 8, height = 5)
